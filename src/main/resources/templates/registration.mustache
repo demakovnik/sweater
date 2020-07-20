@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html >
+<head>
+    <title>Spring Security Example </title>
+    <style>
+        .colortext {
+            color: red; /* Красный цвет выделения */
+        }
+    </style>
+</head>
+<body>
+Add new User
+<form action="/registration" method="post">
+    <div><label> User Name : <input type="text" name="username"/> </label></div>
+    <div><label> Password: <input type="password" name="password"/> </label></div>
+    <input type="hidden"name="_csrf" value="{{_csrf.token}}">
+    <div><input type="submit" value="Add user"/></div>
+</form>
+{{#user}}
+    <span class="colortext">user <strong>{{username}}</strong> already exists!</span>
+{{/user}}
+</body>
+</html>
