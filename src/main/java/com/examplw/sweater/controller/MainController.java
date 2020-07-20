@@ -1,15 +1,18 @@
 package com.examplw.sweater.controller;
 
 import com.examplw.sweater.domain.Message;
+import com.examplw.sweater.domain.User;
 import com.examplw.sweater.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Map;
 
 @Controller
 public class MainController {
@@ -32,9 +35,12 @@ public class MainController {
     }
 
     @PostMapping("add")
-    public String add(@RequestParam String text, @RequestParam String tag,
-                      Map<String, Object> model) {
-        Message message = new Message(text, tag);
+    public String add(
+            @AuthenticationPrincipal User author,
+            @RequestParam String text,
+            @RequestParam String tag,
+            Map<String, Object> model) {
+        Message message = new Message(text, tag, author);
         messageRepository.save(message);
         model.put("messages", messageRepository.findAll());
         return "main";
