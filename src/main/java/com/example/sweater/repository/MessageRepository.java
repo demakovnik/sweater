@@ -1,6 +1,6 @@
-package com.examplw.sweater.repository;
+package com.example.sweater.repository;
 
-import com.examplw.sweater.domain.Message;
+import com.example.sweater.domain.Message;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
