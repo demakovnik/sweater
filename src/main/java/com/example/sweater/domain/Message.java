@@ -2,6 +2,8 @@ package com.example.sweater.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.Set;
 
 @Entity
 @Table(name = "messages")
@@ -15,10 +17,13 @@ public class Message {
     private String text;
     private String tag;
 
+    @ElementCollection(targetClass = java.lang.String.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "message_files", joinColumns = @JoinColumn(name = "message_id"))
+    private Set<String> filenames;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;
-    private String filename;
 
     public String getAuthorName() {
         return author != null ? author.getUsername() : "<none>";
@@ -34,7 +39,7 @@ public class Message {
         this.author = author;
     }
 
-    public User getAuthor() {
+        public User getAuthor() {
         return author;
     }
 
@@ -66,11 +71,11 @@ public class Message {
         this.tag = tag;
     }
 
-    public String getFilename() {
-        return filename;
+    public Set<String> getFilenames() {
+        return filenames;
     }
 
-    public void setFilename(String filename) {
-        this.filename = filename;
+    public void setFilenames(Set<String> filenames) {
+        this.filenames = filenames;
     }
 }

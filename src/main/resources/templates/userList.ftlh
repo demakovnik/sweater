@@ -40,5 +40,4 @@
             </#list>
         </table>
     </div>
-    <a href="/main">Главная</a>
 </@c.page>

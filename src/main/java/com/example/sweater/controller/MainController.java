@@ -68,26 +68,38 @@ public class MainController {
             @AuthenticationPrincipal User author,
             @RequestParam String text,
             @RequestParam String tag,
-            @RequestParam("file") MultipartFile file) throws IOException {
+            @RequestParam("files") MultipartFile[] files) throws IOException {
         Message message = new Message(text, tag, author);
-        if (file != null && !file.getOriginalFilename().isEmpty()) {
-            File uploadDir = new File(uploadPath);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
+        Set<String> filenames = new HashSet<>();
+        for (MultipartFile file : files) {
+            if (file != null && !file.getOriginalFilename().isEmpty()) {
+                Path uploadDir = Files.createDirectories(Path.of(uploadPath, author.getUsername()));
+                //File uploadDirectory = uploadDir.toFile();
+            /*if (!uploadDirectory.exists()) {
+                uploadDirectory.mkdir();
+            }*/
+                String uuidFile = UUID.randomUUID().toString();
+                String resultFileName = uuidFile + file.getOriginalFilename();
+                file.transferTo(new File(uploadDir.toAbsolutePath() + "/" + resultFileName));
+                filenames.add(resultFileName);
             }
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFileName = uuidFile + file.getOriginalFilename();
-            file.transferTo(new File(uploadPath + "/" + resultFileName));
-            message.setFilename(resultFileName);
         }
+        message.setFilenames(filenames);
         messageRepository.save(message);
         return "redirect:/main";
     }
 
-    @GetMapping("delete")
+    @PostMapping("delete")
     public String delete(@RequestParam("messageId") Message message) throws IOException {
         messageRepository.delete(message);
-        Files.deleteIfExists(Path.of(uploadPath + "/" + message.getFilename()));
+        Set<String> filenames = message.getFilenames();
+        for (String filefilename : filenames) {
+            if (filefilename != null) {
+                Path deletingPath = Path.of(uploadPath, message.getAuthorName(), filefilename);
+                Files.deleteIfExists(deletingPath);
+            }
+        }
+
         return "redirect:/main";
     }
 }
