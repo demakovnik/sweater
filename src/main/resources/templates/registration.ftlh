@@ -4,7 +4,7 @@
 <@l.login "/registration" "Add User" true/>
     <#if user??>
         <div class="alert alert-danger" role="alert">
-            User <strong>"${user.getUsername()}"</strong> already exists!
+            ${message?if_exists}
         </div>
     </#if>
 

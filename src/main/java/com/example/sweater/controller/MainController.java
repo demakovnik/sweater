@@ -25,6 +25,7 @@ public class MainController {
     private final MessageRepository messageRepository;
 
     public MainController(MessageRepository messageRepository) {
+
         this.messageRepository = messageRepository;
     }
 
@@ -43,6 +44,7 @@ public class MainController {
                                String filter,
                        Model model) {
         Collection<Message> messages;
+        HashMap<Long, List<String>> filenames = new HashMap<>();
         model.addAttribute("author", author);
         model.addAttribute("roleAdmin", Role.ADMIN);
         if (filter != null && !filter.isEmpty()) {
@@ -55,9 +57,13 @@ public class MainController {
             });
         } else {
             messages = messageRepository.findAll();
+
+            model.addAttribute("filenames", filenames);
+
             model.addAttribute("messages", messages);
 
         }
+        model.addAttribute("filenames", filenames);
         model.addAttribute("messages", messages);
         model.addAttribute("filter", filter);
         return "main";

@@ -1,28 +1,28 @@
 package com.example.sweater.controller;
 
-import com.example.sweater.domain.Role;
 import com.example.sweater.domain.User;
-import com.example.sweater.repository.UserRepository;
+import com.example.sweater.service.UserService;
+import org.dom4j.rule.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-
-import java.util.Collections;
 
 @Controller
 public class RegistrationController {
 
-    private UserRepository userRepository;
+    private UserService userService;
 
     private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @Autowired
-    public RegistrationController(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public RegistrationController(UserService userService) {
+
+        this.userService = userService;
     }
 
     @GetMapping("/registration")
@@ -32,16 +32,22 @@ public class RegistrationController {
 
     @PostMapping("/registration")
     public String addUser(User user, Model model) {
-        User userFromDb = userRepository.findByUsername(user.getUsername());
-        if (userFromDb != null) {
-            model.addAttribute("user", user);
+        if (!userService.addUser(user)) {
+            model.addAttribute("message", "User exists!");
             return "registration";
         }
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setActive(true);
-        user.setRoles(Collections.singleton(Role.USER));
-        userRepository.save(user);
-        return "/login";
+        return "redirect:/login";
+    }
+
+    @GetMapping("/activate/{code}")
+    public String activate(Model model, @PathVariable String code) {
+        boolean isActivated = userService.activateUser(code);
+        if (isActivated) {
+            model.addAttribute("message","user successfully activated");
+        } else {
+            model.addAttribute("message","Activation code is not found");
+        }
+        return "login";
     }
 
 }
