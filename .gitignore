@@ -1,4 +1,5 @@
 .idea
+artifacts
 target
 *.iml
 *.class
